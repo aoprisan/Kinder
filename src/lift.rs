@@ -8,7 +8,6 @@ pub trait Higher<A> {
     type C; //swapped higher type, i.e C = Vec<A>
 }
 
-
 /// macro to lift types
 #[macro_export]
 macro_rules! lift {
@@ -20,6 +19,17 @@ macro_rules! lift {
     }
 }
 
+#[macro_export]
+macro_rules! lift2 {
+    ($t:ident) => {
+        impl<A, T, E> Higher<A> for $t<T, E> {
+            type B = T;
+            type C = $t<A, E>;
+        }
+    }
+}
+
+
 // lifting types
 lift!(Vec);
 lift!(Option);
@@ -29,6 +39,8 @@ lift!(BinaryHeap);
 lift!(BTreeSet);
 lift!(VecDeque);
 lift!(HashSet);
+
+lift2!(Result);
 
 ///SemiGroup trait
 ///requires one function:

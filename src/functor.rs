@@ -28,6 +28,18 @@ impl<A, B> Functor<A> for Option<B> {
     }
 }
 
+// Implementation of Functor for Result
+impl<A, B, E : Copy> Functor<A> for Result<B, E> {
+    fn fmap<F>(&self, f: F) -> Result<A, E>
+        where F: Fn(&B) -> A
+    {
+        match *self {
+            Ok(ref x) => Ok(f(x)),
+            Err(ref e) => Err(*e),
+        }
+    }
+}
+
 // Implementation of Functor for Box
 impl<A, B> Functor<A> for Box<B> {
     fn fmap<F>(&self, f: F) -> Box<A>
@@ -91,5 +103,14 @@ mod test {
     #[test]
     fn test_box() {
         assert_eq!(Box::new(1).fmap(|x| x + 1), Box::new(2));
+    }
+
+    #[test]
+    fn test_result() {
+        let ok: Result<u64, u64> = Ok(1);
+        assert_eq!(ok.fmap(|x| x + 1), Ok(2));
+
+        let err: Result<u64, u64> = Err(1);
+        assert_eq!(err.fmap(|x| x + 1), Err(1));
     }
 }
