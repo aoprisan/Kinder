@@ -9,7 +9,7 @@ impl<A,B> Applicative<A> for Option<B> {
         Some(x)
     }
 
-    fn apply<F>(&self, f: <Self as Higher<F>>::C) -> <Self as Higher<A>>::C 
+    fn apply<F>(&self, f: <Self as Higher<F>>::C) -> <Self as Higher<A>>::C
         where F: Fn(&<Self as Higher<A>>::B) -> A
     {
         match *self {
@@ -17,7 +17,26 @@ impl<A,B> Applicative<A> for Option<B> {
                 Some(fs) => Some(fs(v)),
                 None => None,
             },
-            None => None,          
+            None => None,
+        }
+    }
+}
+
+//Implementation of Applicative for Result
+impl<A,T,E : Copy> Applicative<A> for Result<T, E> {
+    fn lift(x:A) -> <Self as Higher<A>>::C {
+        Ok(x)
+    }
+
+    fn apply<F>(&self, f: <Self as Higher<F>>::C) -> <Self as Higher<A>>::C
+        where F: Fn(&<Self as Higher<A>>::B) -> A
+    {
+        match *self {
+            Ok(ref v) => match f {
+                Ok(fs) => Ok(fs(v)),
+                Err(e2) => Err(e2),
+            },
+            Err(ref e1) => Err(*e1),
         }
     }
 }
@@ -44,7 +63,7 @@ impl<A,B> Applicative<A> for LinkedList<B> {
         ret
     }
 
-    fn apply<F>(&self, fs:<Self as Higher<F>>::C) -> <Self as Higher<A>>::C 
+    fn apply<F>(&self, fs:<Self as Higher<F>>::C) -> <Self as Higher<A>>::C
         where F: Fn(&<Self as Higher<A>>::B) -> A
     {
         let zipped = self.iter().zip(fs.iter());
@@ -58,7 +77,7 @@ impl<A,B> Applicative<A> for Box<B> {
         Box::new(x)
     }
 
-    fn apply<F>(&self, fs: <Self as Higher<F>>::C) -> <Self as Higher<A>>::C 
+    fn apply<F>(&self, fs: <Self as Higher<F>>::C) -> <Self as Higher<A>>::C
         where F: Fn(&<Self as Higher<A>>::B) -> A
     {
         Box::new(fs(self))
@@ -73,11 +92,10 @@ impl<A,B> Applicative<A> for VecDeque<B> {
         ret
     }
 
-    fn apply<F>(&self, fs: <Self as Higher<F>>::C) -> <Self as Higher<A>>::C 
+    fn apply<F>(&self, fs: <Self as Higher<F>>::C) -> <Self as Higher<A>>::C
         where F: Fn(&<Self as Higher<A>>::B) -> A
     {
         let zipped = self.iter().zip(fs.iter());
         zipped.map(|(x,f)| f(x)).collect::<VecDeque<A>>()
     }
 }
-

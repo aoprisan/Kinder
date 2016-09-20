@@ -34,14 +34,30 @@ impl<A, B> Monad<A> for Option<B> {
     }
 }
 
+// Implementation of Monad for Result
+impl<A, T, E : Copy> Monad<A> for Result<T, E> {
+    fn lift(x: A) -> <Self as Higher<A>>::C {
+        Ok(x)
+    }
+
+    fn bind<F>(&self, mut f: F) -> Result<A, E>
+        where F: FnMut(&T) -> Result<A, E>
+    {
+        match *self {
+            Ok(ref v) => f(v),
+            Err(ref e1) => Err(*e1),
+        }
+    }
+}
+
 //implementation of Moand for Box
 impl<A,B> Monad<A> for Box<B> {
     fn lift(x:A) -> <Self as Higher<A>>::C {
         Box::new(x)
     }
 
-    fn bind<F>(&self, mut f: F) -> Box<A> 
-        where F : FnMut(&B) -> Box<A> 
+    fn bind<F>(&self, mut f: F) -> Box<A>
+        where F : FnMut(&B) -> Box<A>
     {
         f(self)
     }
@@ -71,7 +87,7 @@ impl<A: Clone, B: Clone> Monad<A> for VecDeque<B> {
     }
 
     fn bind<F>(&self, mut f: F) -> VecDeque<A>
-        where F: FnMut(&B) -> VecDeque<A> 
+        where F: FnMut(&B) -> VecDeque<A>
     {
        let mut ret = VecDeque::new();
        let mapped = self.iter().map(f).collect::<VecDeque<VecDeque<A>>>();
@@ -104,7 +120,7 @@ impl<A: Ord, B:Ord> Monad<A> for BinaryHeap<B> {
         ret
     }
 
-    fn bind<F>(&self, mut f: F) -> BinaryHeap<A> 
+    fn bind<F>(&self, mut f: F) -> BinaryHeap<A>
         where F: FnMut(&B) -> BinaryHeap<A>
     {
         self.iter().flat_map(f).collect::<BinaryHeap<A>>()
@@ -129,11 +145,23 @@ impl<A: Eq + Hash, B: Eq + Hash> Monad<A> for HashSet<B> {
 #[cfg(test)]
 mod test {
     use lift::{Higher, Monad};
-    
+
     #[test]
     fn test_option() {
         assert_eq!(Option::lift("a"), Some("a"));
         assert_eq!(Some(2).bind(|x| Some(x+1)), Some(3));
+    }
+
+    #[test]
+    fn test_result() {
+        let ok: Result<u64, u64> = Ok(1);
+
+        assert_eq!(Result::lift(1), ok);
+
+        assert_eq!(ok.bind(|x| Ok(x + 1)), Ok(2));
+
+        let err: Result<u64, u64> = Err(1);
+        assert_eq!(err.bind(|x| Ok(x + 1)), Err(1));
     }
 
     #[test]
