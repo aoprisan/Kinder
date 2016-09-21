@@ -34,7 +34,7 @@ impl<A, B> Monad<A> for Option<B> {
 }
 
 // Implementation of Monad for Result
-impl<A, T, E : Copy> Monad<A> for Result<T, E> {
+impl<A, T, E : Clone> Monad<A> for Result<T, E> {
     fn lift(x: A) -> <Self as Higher<A>>::C {
         Ok(x)
     }
@@ -44,7 +44,7 @@ impl<A, T, E : Copy> Monad<A> for Result<T, E> {
     {
         match *self {
             Ok(ref v) => f(v),
-            Err(ref e1) => Err(*e1),
+            Err(ref e1) => Err(e1.clone()),
         }
     }
 }
@@ -153,14 +153,14 @@ mod test {
 
     #[test]
     fn test_result() {
-        let ok: Result<u64, u64> = Ok(1);
+        let ok: Result<u64, String> = Ok(1);
 
         assert_eq!(Result::lift(1), ok);
 
         assert_eq!(ok.bind(|x| Ok(x + 1)), Ok(2));
 
-        let err: Result<u64, u64> = Err(1);
-        assert_eq!(err.bind(|x| Ok(x + 1)), Err(1));
+        let err: Result<u64, String> = Err("error".to_string());
+        assert_eq!(err.bind(|x| Ok(x + 1)), err);
     }
 
     #[test]

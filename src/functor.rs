@@ -29,13 +29,13 @@ impl<A, B> Functor<A> for Option<B> {
 }
 
 // Implementation of Functor for Result
-impl<A, B, E : Copy> Functor<A> for Result<B, E> {
+impl<A, B, E : Clone> Functor<A> for Result<B, E> {
     fn fmap<F>(&self, f: F) -> Result<A, E>
         where F: Fn(&B) -> A
     {
         match *self {
             Ok(ref x) => Ok(f(x)),
-            Err(ref e) => Err(*e),
+            Err(ref e) => Err(e.clone()),
         }
     }
 }
@@ -107,10 +107,10 @@ mod test {
 
     #[test]
     fn test_result() {
-        let ok: Result<u64, u64> = Ok(1);
+        let ok: Result<u64, String> = Ok(1);
         assert_eq!(ok.fmap(|x| x + 1), Ok(2));
 
-        let err: Result<u64, u64> = Err(1);
-        assert_eq!(err.fmap(|x| x + 1), Err(1));
+        let err: Result<u64, String> = Err("error".to_string());
+        assert_eq!(err.fmap(|x| x + 1), err);
     }
 }

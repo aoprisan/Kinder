@@ -23,7 +23,7 @@ impl<A,B> Applicative<A> for Option<B> {
 }
 
 //Implementation of Applicative for Result
-impl<A,T,E : Copy> Applicative<A> for Result<T, E> {
+impl<A,T,E : Clone> Applicative<A> for Result<T, E> {
     fn lift(x:A) -> <Self as Higher<A>>::C {
         Ok(x)
     }
@@ -36,7 +36,7 @@ impl<A,T,E : Copy> Applicative<A> for Result<T, E> {
                 Ok(fs) => Ok(fs(v)),
                 Err(e2) => Err(e2),
             },
-            Err(ref e1) => Err(*e1),
+            Err(ref e1) => Err(e1.clone()),
         }
     }
 }
