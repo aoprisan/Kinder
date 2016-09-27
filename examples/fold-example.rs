@@ -1,8 +1,8 @@
 extern crate kinder;
 
-use kinder::lift::{Foldable, Monoid, SemiGroup};
+use kinder::lift::{Foldable, Monoid};
 
-fn sum_foldable<B : SemiGroup<A=B> + Monoid<A=B>, T: Foldable<A=B>>(xs: &T) -> B 
+fn sum_foldable<B : Monoid<A=B>, T: Foldable<A=B>>(xs: &T) -> B 
 {
     xs.foldr(B::id(), |x, y| x.add(y))
 }
