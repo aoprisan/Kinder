@@ -21,11 +21,21 @@ macro_rules! lift {
 }
 
 #[macro_export]
-macro_rules! lift2 {
+macro_rules! lift2left {
     ($t:ident) => {
         impl<A, T, E> Higher<A> for $t<T, E> {
             type B = T;
             type C = $t<A, E>;
+        }
+    }
+}
+
+#[macro_export]
+macro_rules! lift2right {
+    ($t:ident) => {
+        impl<A, L, R> Higher<A> for $t<L, R> {
+            type B = T;
+            type C = $t<L, A>;
         }
     }
 }
@@ -41,7 +51,7 @@ lift!(BTreeSet);
 lift!(VecDeque);
 lift!(HashSet);
 
-lift2!(Result);
+lift2left!(Result);
 
 ///SemiGroup trait
 ///requires one function:

@@ -24,7 +24,7 @@ impl<A,B> Applicative<A> for Option<B> {
 
 //Implementation of Applicative for Result
 impl<A,T,E : Clone> Applicative<A> for Result<T, E> {
-    fn lift(x:A) -> <Self as Higher<A>>::C {
+    fn raise(x:A) -> <Self as Higher<A>>::C {
         Ok(x)
     }
 
