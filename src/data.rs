@@ -1,6 +1,12 @@
 use lift::*;
 
-pub type Xor<L,R> = Result<R,L>;
+pub enum Xor<L, R> {
+    Left(L),
+    Right(R)
+}
+
+lift2right!(Xor);
+
 
 pub enum Ior<L, R> {
     Left(L),
@@ -20,10 +26,4 @@ impl<A> Lazy<A> {
             Lazy::Lazy(ref f) => f()
         }
     }
-}
-
-pub enum TailRec<A> {
-    Pure(A),
-    Suspend(Lazy<A>),
-    FlatMap(Box<TailRec<A>>, Fn(A)->Box<TailRec<B>>)
 }
