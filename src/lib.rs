@@ -7,3 +7,4 @@ pub mod monoid;
 pub mod semigroup;
 pub mod applicative;
 pub mod foldable;
+pub mod hkt;
