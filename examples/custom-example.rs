@@ -22,7 +22,7 @@ impl<A,B> Functor<A> for Holder<B> {
 }
 
 impl<A, B> Monad<A> for Holder<B> {
-    fn lift(x:A) -> <Self as Higher<A>>::C {
+    fn lift(x:A) -> <Self as Higher<A>>::FOutput {
         Holder { elem: x }
     }
 

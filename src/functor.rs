@@ -101,4 +101,11 @@ mod test {
         let err: Result<u64, String> = Err("error".to_string());
         assert_eq!(err.fmap(|x| x + 1), err);
     }
+
+    #[test]
+    pub fn test_functor() {
+        assert_eq!(Some(10).fmap(|x| x + 1), Some(11));
+        assert_eq!(None.fmap(|x| x + 1), None);
+    }
+
 }
