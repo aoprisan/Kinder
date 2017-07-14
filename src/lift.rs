@@ -58,7 +58,7 @@ lift2left!(Result);
 ///add: &self -> &A -> A
 pub trait SemiGroup {
     type A;
-    fn add(&self, Current: &Self::A) -> Self::A;
+    fn add(&self, b: &Self::A) -> Self::A;
 }
 
 ///`Monoid` trait
@@ -175,8 +175,8 @@ macro_rules! semigroup_num {
     ($t:ident) => {
         impl SemiGroup for $t {
             type A = $t;
-            fn add(&self, Current: &Self::A) -> Self::A {
-                self + Current
+            fn add(&self, b: &Self::A) -> Self::A {
+                self + b
             }
         }
     }
@@ -188,10 +188,10 @@ macro_rules! semigroup {
     ($t:ident) => {
         impl<T: Clone> SemiGroup for $t<T> {
             type A = $t<T>;
-            fn add(&self, Current: &Self::A) -> Self::A {
+            fn add(&self, b: &Self::A) -> Self::A {
                 let mut ret = $t::new();
                 ret.extend(self.iter().cloned());
-                ret.extend(Current.iter().cloned());
+                ret.extend(b.iter().cloned());
                 ret
             }
         }
@@ -204,10 +204,10 @@ macro_rules! semigroup_ord {
     ($t:ident) => {
         impl<T: Clone + Ord> SemiGroup for $t<T> {
             type A = $t<T>;
-            fn add(&self, Current: &Self::A) -> Self::A {
+            fn add(&self, b: &Self::A) -> Self::A {
                 let mut ret = $t::new();
                 ret.extend(self.iter().cloned());
-                ret.extend(Current.iter().cloned());
+                ret.extend(b.iter().cloned());
                 ret
             }
         }
